@@ -1,187 +1,125 @@
-# Welcome to WalkSafe 👋
+# WalkSafe 🚶
 
-This is a [React Native](https://reactnative.dev/) mobile application with a Django backend.
+A mobile app for finding safe, healthy walking routes. It combines real-time map navigation with an intelligent routing engine that factors in air quality (AQI), tree cover, traffic, and elevation to suggest the best path between two points.
+
+## Tech Stack
+
+- **Frontend** — React Native (Expo), TypeScript
+- **Backend** — Django REST API, PostgreSQL
+- **Routing engine** — Python, A\* algorithm, OpenStreetMap graph, AQI & traffic data
+- **Infrastructure** — Docker Compose
 
 ## Project Structure
 
-- `frontend/` - React Native mobile application (Expo)
-- `backend/` - Django REST API server
-- `docker-compose.yml` - Docker orchestration configuration
+```
+WalkSafe_Mobile/
+├── frontend/          # React Native / Expo app
+├── backend/
+│   ├── apps/          # Django apps (accounts, routes, tags, reviews)
+│   ├── route_backend/ # A* routing engine with GIS & AQI data
+│   └── server/        # Django project settings
+└── docker-compose.yml
+```
 
-## Quick Start with Docker (Recommended)
+## Getting Started
 
 ### Prerequisites
-- [Docker](https://www.docker.com/get-started) and Docker Compose installed
-- [Node.js](https://nodejs.org/) and npm (for running the frontend locally)
 
-### Running the Application
+- [Docker](https://www.docker.com/get-started) and Docker Compose
+- [Node.js](https://nodejs.org/) and npm
+- A [Mapbox](https://account.mapbox.com) access token
 
-1. **Clone the repository and navigate to the project directory**
-
-   ```bash
-   cd WalkSafe
-   ```
-
-2. **Start backend services with Docker Compose**
-
-   ```bash
-   docker-compose up -d
-   ```
-
-   This will start:
-   - PostgreSQL database on port 5433
-   - Django backend on http://localhost:8000
-
-3. **Run the frontend locally**
-
-   ```bash
-   cd frontend
-   npm install
-   npx expo start
-   ```
-
-   The Expo development server will start and you can:
-   - Scan the QR code with Expo Go app on your phone
-   - Press `i` for iOS simulator
-   - Press `a` for Android emulator
-
-4. **Access the services**
-   - Backend API: http://localhost:8000
-   - Admin Panel: http://localhost:8000/admin
-   - Frontend: Expo DevTools in your terminal
-
-5. **Stop the backend services**
-
-   ```bash
-   docker-compose down
-   ```
-
-   To remove volumes as well:
-   ```bash
-   docker-compose down -v
-   ```
-
-### Migrating Existing Data
-
-If you have an existing PostgreSQL database on your local machine:
-
-```bash
-# Quick automated migration
-./migrate-data.sh
-
-# Or using Make
-make migrate-local-db
-```
-
-See `MIGRATION_GUIDE.md` for detailed instructions and alternative methods.
-
-## Development Workflow
-
-### Starting Development
-
-```bash
-# Terminal 1: Start backend services
-docker-compose up
-
-# Terminal 2: Start frontend
-cd frontend
-npx expo start
-```
-
-### Important Notes
-
-- **Backend runs in Docker** on `localhost:8000`
-- **Frontend runs locally** for better Expo/mobile development experience
-- Make sure your phone and computer are on the same WiFi network for Expo Go
-- The frontend connects to the backend at `localhost:8000` (update in `.env` if needed)
-
-### Important Notes for Mobile Development
-
-When using the frontend container, you'll need to update your local IP address in `docker-compose.yml`:
-
-```yaml
-environment:
-  - REACT_NATIVE_PACKAGER_HOSTNAME=YOUR_LOCAL_IP  # e.g., 192.168.1.100
-```
-
-Find your local IP:
-- **macOS/Linux**: `ifconfig | grep "inet " | grep -v 127.0.0.1`
-- **Windows**: `ipconfig`
-
-## Manual Setup (Without Docker)
-
-### Frontend
-
-1. Navigate to the frontend directory
-
-   ```bash
-   cd frontend
-   ```
-
-2. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-3. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-See `frontend/README.md` for more details.
-
-### Backend
-
-1. Navigate to the backend directory
-
-   ```bash
-   cd backend
-   ```
-
-2. Create a virtual environment
-
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. Install dependencies
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. Run migrations
-
-   ```bash
-   python manage.py migrate
-   ```
-
-5. Create a superuser (optional)
-
-   ```bash
-   python manage.py createsuperuser
-   ```
-
-6. Run the development server
-
-   ```bash
-   python manage.py runserver
-   ```
-
-## Environment Variables
-
-Copy the example environment files and update them with your configuration:
+### 1. Environment variables
 
 ```bash
 cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
 ```
 
-## Learn more
+Open `frontend/.env` and fill in your values:
+
+```env
+EXPO_PUBLIC_API_URL=http://<your-local-ip>:8000
+MAPBOX_ACCESS_TOKEN=<your-mapbox-token>
+```
+
+> **Note:** Use your machine's local IP (not `localhost`) so the app can reach the backend from a physical device or emulator.
+>
+> Find it with:
+> - **macOS/Linux**: `ifconfig | grep "inet " | grep -v 127.0.0.1`
+> - **Windows**: `ipconfig`
+
+### 2. Start the backend
+
+```bash
+docker-compose up -d
+```
+
+This starts:
+- PostgreSQL on port `5433`
+- Django API on `http://localhost:8000`
+
+### 3. Start the frontend
+
+```bash
+cd frontend
+npm install
+npx expo start
+```
+
+Then:
+- Scan the QR code with **Expo Go** on your phone
+- Press `i` for the iOS simulator
+- Press `a` for the Android emulator
+
+### 4. Stop the backend
+
+```bash
+docker-compose down
+
+# To also remove the database volume:
+docker-compose down -v
+```
+
+## Manual Setup (Without Docker)
+
+### Backend
+
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate       # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py createsuperuser  # optional
+python manage.py runserver
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npx expo start
+```
+
+## Features
+
+- 🗺️ Interactive map with real-time location tracking
+- 🧭 Turn-by-turn navigation view
+- 🌿 Smart routing based on AQI, tree cover, traffic & elevation
+- 🔍 Search and explore saved routes
+- 👤 User accounts and profiles
+- ⭐ Route reviews
+- 📶 Offline mode with automatic sync on reconnect
+
+## API
+
+The Django admin panel is available at `http://localhost:8000/admin`.
+
+## Links
 
 - [Expo documentation](https://docs.expo.dev/)
 - [Django documentation](https://docs.djangoproject.com/)
 - [Docker documentation](https://docs.docker.com/)
+- [Mapbox](https://docs.mapbox.com/)

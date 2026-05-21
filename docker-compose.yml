@@ -1,0 +1,56 @@
+version: '3.8'
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: walksafe-db
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"  # Changed to 5433 to avoid conflict with local PostgreSQL
+    networks:
+      - walksafe-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-walksafe_user} -d ${POSTGRES_DB:-walksafe}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Django Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: walksafe-backend
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn --bind 0.0.0.0:8000 --workers 3 server.wsgi:application"
+    volumes:
+      - ./backend:/app
+      - media_files:/app/media
+      - static_files:/app/staticfiles
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      - DEBUG=True
+      - ALLOWED_HOSTS=*
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - walksafe-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  media_files:
+  static_files:
+
+networks:
+  walksafe-network:
+    driver: bridge

@@ -1,0 +1,44 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Database
+*.sqlite3
+*.db
+
+# Environment variables
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Django
+staticfiles/
+media/profile_photos/*
+
+# Route backend resources (if generated locally)
+route_backend/resources/traffic_data.json
+route_backend/resources/weights_data.csv
+route_backend/resources/table_data/
+route_backend/resources/shapefiles/

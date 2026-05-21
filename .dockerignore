@@ -1,0 +1,27 @@
+# Docker compose files
+docker-compose.override.yml
+
+# Environment files with secrets
+.env
+*.env
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+LICENSE
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
